@@ -10,7 +10,7 @@ ENABLE_VENDOR_IMAGE := true
 endif
 
 # Default A/B configuration.
-ENABLE_AB ?= true
+ENABLE_AB := false
 
 # Disable QTIC until it's brought up in split system/vendor
 # configuration to avoid compilation breakage.
@@ -37,26 +37,9 @@ ifeq ($(strip $(TARGET_KERNEL_VERSION)), 4.19)
     TARGET_USES_RRO := true
 endif
 
-ifeq ($(TARGET_KERNEL_VERSION),$(filter $(TARGET_KERNEL_VERSION),4.14 4.19))
-  SHIPPING_API_LEVEL :=30
-  ifeq (true,$(call math_gt_or_eq,$(SHIPPING_API_LEVEL),29))
-    # Dynamic-partition enabled by default for new launch config
-    BOARD_DYNAMIC_PARTITION_ENABLE := true
-    # First launch API level
-    PRODUCT_SHIPPING_API_LEVEL := $(SHIPPING_API_LEVEL)
-    # Enable virtual-ab by default
-    ENABLE_VIRTUAL_AB := true
-    # Enable incremental FS feature
-    PRODUCT_PROPERTY_OVERRIDES += ro.incremental.enable=1
-  else
-    BOARD_DYNAMIC_PARTITION_ENABLE := false
-    $(call inherit-product, build/make/target/product/product_launched_with_p.mk)
-  endif
-else
-  SHIPPING_API_LEVEL :=28
-  BOARD_DYNAMIC_PARTITION_ENABLE := false
-  $(call inherit-product, build/make/target/product/product_launched_with_p.mk)
-endif
+SHIPPING_API_LEVEL := 30
+BOARD_DYNAMIC_PARTITION_ENABLE := false
+$(call inherit-product, build/make/target/product/product_launched_with_p.mk)
 
 ifeq (true,$(call math_gt_or_eq,$(SHIPPING_API_LEVEL),29))
  # f2fs utilities
@@ -97,7 +80,7 @@ PRODUCT_COPY_FILES += $(LOCAL_PATH)/default/fstab_non_AB_dynamic_partition_varia
 PRODUCT_COPY_FILES += $(LOCAL_PATH)/emmc/fstab_non_AB_dynamic_partition_variant.qti:$(TARGET_COPY_OUT_RAMDISK)/fstab.emmc
 endif
 
-BOARD_AVB_ENABLE := true
+BOARD_AVB_ENABLE := false
 
 # Enable product partition
 PRODUCT_BUILD_PRODUCT_IMAGE := true
